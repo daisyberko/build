@@ -31,12 +31,13 @@ endif
 
 # EXODUS's FDO implementation
 ifeq ($(USE_FDO_OPTIMIZATION),true)
-  DEVICE_PROFILE := /.exodus_profiles/$(PRODUCT_OUT)/$(TARGET_$(combo_2nd_arch_prefix)ARCH)/$(TARGET_$(combo_2nd_arch_prefix)ARCH_VARIANT)/profile)
+  DEVICE_PROFILE := /.exodus_profiles/$(PRODUCT_OUT)/$(TARGET_$(combo_2nd_arch_prefix)ARCH)/$(TARGET_$(combo_2nd_arch_prefix)ARCH_VARIANT)/profile_tests
 
   # Available optimizations
   SAMPLE_PROFILING_FLAGS := \
       -fbranch-probabilities \
-      -fvpt -funroll-loops \
+      -fvpt \
+      -funroll-loops \
       -fpeel-loops \
       -ftracer \
       -ftree-vectorize \
@@ -54,7 +55,7 @@ ifeq ($(USE_FDO_OPTIMIZATION),true)
 
   ifeq ($(wildcard $(DEVICE_PROFILE)),)
     # Generate FDO instrumentation for the target device
-    $(combo_2nd_arch_prefix)TARGET_FDO_CFLAGS := -fprofile-generate=/media/primedirective/profile -DANDROID_FDO
+    $(combo_2nd_arch_prefix)TARGET_FDO_CFLAGS := -fprofile-generate=$(DEVICE_PROFILE) -DANDROID_FDO
     $(combo_2nd_arch_prefix)TARGET_FDO_LDFLAGS := -lgcov -lgcc
   else
     # Compile with profile-guided optimizations
