@@ -17,6 +17,18 @@
 # Setup FDO related flags.
 $(combo_2nd_arch_prefix)TARGET_FDO_CFLAGS:=
 
+# Reset profiling database at the first of each month to ensure we stay accurate
+ifneq ($(wildcard $(DEVICE_PROFILE)),)
+  CURRENT_DATE := $(shell date '+%d')
+  RESET_DATE := 01
+  ifeq ($(CURRENT_DATE),$(RESET_DATE))
+    $(shell @echo rm -rf /.exodus_profiles)
+    $(info "=========================================================================")
+    $(info "=======================RESETTING PROFILING DATA!=========================")
+    $(info "=========================================================================")
+  endif
+endif
+
 # EXODUS's FDO implementation
 ifeq ($(USE_FDO_OPTIMIZATION),true)
   DEVICE_PROFILE := /.exodus_profiles/$(PRODUCT_OUT)/$(TARGET_$(combo_2nd_arch_prefix)ARCH)/$(TARGET_$(combo_2nd_arch_prefix)ARCH_VARIANT)/profile)
@@ -40,7 +52,7 @@ ifeq ($(USE_FDO_OPTIMIZATION),true)
       -Wcoverage-mismatch \
       -Wno-error
 
-  ifeq ($(wildcard $(DEVICE_PROFILE),)
+  ifeq ($(wildcard $(DEVICE_PROFILE)),)
     # Generate FDO instrumentation for the target device
     $(combo_2nd_arch_prefix)TARGET_FDO_CFLAGS := -fprofile-generate=/media/primedirective/profile -DANDROID_FDO
     $(combo_2nd_arch_prefix)TARGET_FDO_LDFLAGS := -lgcov -lgcc
