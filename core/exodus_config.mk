@@ -103,6 +103,12 @@ ifeq ($(USE_LTO),true)
     -Wl,-flto-report
 endif
 
+# profile-directed optimization
+ifeq ($(USE_FDO_OPTIMIZATION),true)
+  EXODUS_FDO_MODULES := \
+    libandroid_runtime
+endif
+
 # fstrict-aliasing. Thumb is defaulted off for AOSP. Use VANIR_SPECIAL_CASE_MODULES to
 # temporarily disable fstrict-aliasing locally in modules we dont care about or until the
 # error it contains is properly fixed.
