@@ -17,12 +17,12 @@
 # Setup FDO related flags.
 $(combo_2nd_arch_prefix)TARGET_FDO_CFLAGS:=
 
-# EXODUS
+# EXODUS's FDO implementation
 ifeq ($(USE_FDO_OPTIMIZATION),true)
   DEVICE_PROFILE := /.exodus_profiles/$(PRODUCT_OUT)/$(TARGET_$(combo_2nd_arch_prefix)ARCH)/$(TARGET_$(combo_2nd_arch_prefix)ARCH_VARIANT)/profile)
 
   # Available optimizations
-  SAMPLE_PROFILE_FLAGS := \
+  SAMPLE_PROFILING_FLAGS := \
       -fbranch-probabilities \
       -fvpt -funroll-loops \
       -fpeel-loops \
@@ -48,12 +48,17 @@ ifeq ($(USE_FDO_OPTIMIZATION),true)
     # Compile with profile-guided optimizations
     $(combo_2nd_arch_prefix)TARGET_FDO_CFLAGS := \
         -fprofile-use=$(DEVICE_PROFILE) \
-        $(SAMPLE_PROFILE_FLAGS)
+        $(SAMPLE_PROFILING_FLAGS)
   endif
-endif
 
 else
-# AOSP
+
+# Clean up profiles we've generated now that FDO is off
+ifneq ($(wildcard $(DEVICE_PROFILE)),)
+  $(shell @echo rm -rf /.exodus_profiles)
+endif
+
+# AOSP's FDO implementation
 ifeq ($(strip $(BUILD_FDO_INSTRUMENT)), true)
   # Set BUILD_FDO_INSTRUMENT=true to turn on FDO instrumentation.
   # The profile will be generated on /sdcard/fdo_profile on the device.
